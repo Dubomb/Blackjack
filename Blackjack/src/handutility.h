@@ -8,7 +8,7 @@ class Hand
 public:
 	Hand();
 	
-	std::string add_card(const std::array<int, 52>& deck, int& card);
+	std::string add_card(int card);
 	void clear_hand();
 
 	int get_total() const;

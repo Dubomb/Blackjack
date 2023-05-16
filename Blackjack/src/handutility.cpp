@@ -12,21 +12,19 @@ Hand::Hand()
 	hand.reserve(4);
 }
 
-std::string Hand::add_card(const std::array<int, 52>& deck, int& card)
+std::string Hand::add_card(int card)
 {
-	int card_number = hand.emplace_back(deck[card]);
+	int card_number = hand.emplace_back(card);
 
-	if (deck[card] == 1)
+	if (card == 1)
 	{
 		hand_total += 11;
 		ace_count++;
 	}
 	else
 	{
-		hand_total += std::clamp(deck[card], 1, 10);
+		hand_total += std::clamp(card, 1, 10);
 	}
-
-	card++;
 
 	if (hand_total > BLACKJACK && ace_count > 0)
 	{
