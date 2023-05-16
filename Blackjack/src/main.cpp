@@ -6,6 +6,8 @@
 #include <random>
 #include <ctime>
 
+#include "handutility.h"
+
 const int STARTING_MONEY = 100;
 const int BLACKJACK = 21;
 const int BLACKJACK_MULTIPLIER = 3;
@@ -47,33 +49,6 @@ int get_bet(int money)
 	return bet;
 }
 
-std::string get_card_string(int card)
-{
-	switch (card)
-	{
-	case 1:
-		return "A";
-	case 11:
-		return "J";
-	case 12:
-		return "Q";
-	case 13:
-		return "K";
-	default:
-		return std::to_string(card);
-	}
-}
-
-void print_hand(const std::vector<int>& hand)
-{
-	for (int card : hand)
-	{
-		std::cout << get_card_string(card) << " ";
-	}
-
-	std::cout << "\n";
-}
-
 int main()
 {
 	std::cout << "Welcome to blackjack!\n";
@@ -88,6 +63,9 @@ int main()
 	while (running && money > 0)
 	{
 		std::string command;
+
+		Hand player_hand;
+		Hand dealer_hand;
 
 		std::cout << "\nType \"quit\" to stop or \"play\" to play.\n";
 
@@ -107,63 +85,27 @@ int main()
 
 			std::cout << "\nRemaining money: $" << money << "\n\n";
 
-			std::vector<int> player_hand;
-			player_hand.reserve(4);
-
-			std::vector<int> dealer_hand;
-			dealer_hand.reserve(4);
-
-			std::vector<int> current_deck(deck.begin(), deck.end());
+			std::array<int, 52> current_deck(deck);
 			std::shuffle(current_deck.begin(), current_deck.end(), generator);
 
 			std::cout << "Drawing cards!\n\n";
 
 			int current_card = 0;
 
-			int player_sum = 0;
-			int dealer_sum = 0;
-
-			int player_ace_count = 0;
-			int dealer_ace_count = 0;
-
-			for (; current_card < 2; current_card++)
+			while (current_card < 2)
 			{
-				player_hand.emplace_back(current_deck[current_card]);
-
-				if (current_deck[current_card] == 1)
-				{
-					player_sum += 11;
-					player_ace_count++;
-				}
-				else
-				{
-					player_sum += std::clamp(current_deck[current_card], 1, 10);
-				}
+				player_hand.add_card(current_deck, current_card);
 			}
 
-			dealer_hand.emplace_back(current_deck[current_card]);
+			dealer_hand.add_card(current_deck, current_card);
 
-			if (current_deck[current_card] == 1)
-			{
-				dealer_sum += 11;
-				dealer_ace_count++;
-			}
-			else
-			{
-				dealer_sum += std::clamp(current_deck[current_card], 1, 10);
-			}
+			std::cout << "Your hand is: " << player_hand.get_hand_string();
 
-			current_card++;
+			std::cout << "Your total is: " << player_hand.get_total() << "\n\n";
 
-			std::cout << "Your hand is: ";
-			print_hand(player_hand);
+			std::cout << "The dealer's hand is: " << dealer_hand.get_hand_string() << "\n";
 
-			std::cout << "Your total is: " << player_sum << "\n\n";
-
-			std::cout << "The dealer's hand is: ";
-			print_hand(dealer_hand);
-
-			while (player_sum < BLACKJACK)
+			while (player_hand.get_total() < BLACKJACK)
 			{
 				std::cout << "\nType \"hit\" to take another card or \"stand\" to end your turn.\n";
 
@@ -171,31 +113,12 @@ int main()
 
 				if (!command.compare("hit"))
 				{
-					player_hand.emplace_back(current_deck[current_card]);
+					std::string card_string = player_hand.add_card(current_deck, current_card);
 
-					if (current_deck[current_card] == 1)
-					{
-						player_sum += 11;
-						player_ace_count++;
-					}
-					else
-					{
-						player_sum += std::clamp(current_deck[current_card], 1, 10);
-					}
+					std::cout << "\nYou drew a " << card_string << "!\n";
+					std::cout << "Your hand is " << player_hand.get_hand_string() << "\n";
 
-					if (player_sum > BLACKJACK && player_ace_count > 0)
-					{
-						player_sum -= 10;
-						player_ace_count--;
-					}
-
-					std::cout << "\nYou drew a " << get_card_string(current_deck[current_card]) << "!\n";
-					std::cout << "Your hand is ";
-					print_hand(player_hand);
-
-					std::cout << "Your total is: " << player_sum << "\n";
-
-					current_card++;
+					std::cout << "Your total is: " << player_hand.get_total() << "\n";
 				}
 				else if (!command.compare("stand"))
 				{
@@ -207,57 +130,43 @@ int main()
 				}
 			}
 
-			if (player_sum == BLACKJACK)
+			int final_player_total = player_hand.get_total();
+
+			if (final_player_total == BLACKJACK)
 			{
 				std::cout << "\nYou have blackjack!\n";
 
 				money += bet * BLACKJACK_MULTIPLIER;
 				continue;
 			}
-			else if (player_sum > BLACKJACK)
+			else if (final_player_total > BLACKJACK)
 			{
 				std::cout << "\nYou bust!\n";
 				continue;
 			}
 
-			while (dealer_sum < DEALER_LIMIT)
+			while (dealer_hand.get_total() < DEALER_LIMIT)
 			{
-				dealer_hand.emplace_back(current_deck[current_card]);
+				std::string card_string = dealer_hand.add_card(current_deck, current_card);
 
-				if (current_deck[current_card] == 1)
-				{
-					dealer_sum += 11;
-					dealer_ace_count++;
-				}
-				else
-				{
-					dealer_sum += std::clamp(current_deck[current_card], 1, 10);
-				}
+				std::cout << "\nDealer drew a " << card_string << "!\n";
+				std::cout << "Dealer hand is " << dealer_hand.get_hand_string() << "\n";
 
-				if (dealer_sum > BLACKJACK && dealer_ace_count > 0)
-				{
-					dealer_sum -= 10;
-					dealer_ace_count--;
-				}
-
-				std::cout << "\nDealer drew a " << get_card_string(current_deck[current_card]) << "!\n";
-				std::cout << "Dealer hand is ";
-				print_hand(dealer_hand);
-				std::cout << "Dealer total is " << dealer_sum << "\n";
-
-				current_card++;
+				std::cout << "Dealer total is " << dealer_hand.get_total() << "\n";
 			}
 
-			if (dealer_sum > BLACKJACK)
+			int final_dealer_total = dealer_hand.get_total();
+
+			if (dealer_hand.get_total() > BLACKJACK)
 			{
 				std::cout << "\nDealer bust!\n";
 				money += bet * WIN_MULTIPLIER;
 			}
-			else if (dealer_sum > player_sum)
+			else if (final_dealer_total > final_player_total)
 			{
 				std::cout << "\nDealer wins!\n";
 			}
-			else if (dealer_sum < player_sum)
+			else if (final_dealer_total < final_player_total)
 			{
 				std::cout << "\nYou win!\n";
 
