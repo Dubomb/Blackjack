@@ -6,7 +6,7 @@
 #include <random>
 #include <ctime>
 
-const  int STARTING_MONEY = 100;
+const int STARTING_MONEY = 100;
 const int BLACKJACK = 21;
 const int BLACKJACK_MULTIPLIER = 3;
 const int WIN_MULTIPLIER = 2;
@@ -158,13 +158,14 @@ int main()
 			std::cout << "Your hand is: ";
 			print_hand(player_hand);
 
+			std::cout << "Your total is: " << player_sum << "\n\n";
+
 			std::cout << "The dealer's hand is: ";
 			print_hand(dealer_hand);
 
 			while (player_sum < BLACKJACK)
 			{
 				std::cout << "\nType \"hit\" to take another card or \"stand\" to end your turn.\n";
-				std::cout << "Your total is: " << player_sum << "\n";
 
 				std::getline(std::cin, command);
 
@@ -191,6 +192,8 @@ int main()
 					std::cout << "\nYou drew a " << get_card_string(current_deck[current_card]) << "!\n";
 					std::cout << "Your hand is ";
 					print_hand(player_hand);
+
+					std::cout << "Your total is: " << player_sum << "\n";
 
 					current_card++;
 				}
