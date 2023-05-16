@@ -7,16 +7,13 @@
 #include <ctime>
 
 #include "handutility.h"
+#include "deckutility.h"
 
 const int STARTING_MONEY = 100;
 const int BLACKJACK = 21;
 const int BLACKJACK_MULTIPLIER = 3;
 const int WIN_MULTIPLIER = 2;
 const int DEALER_LIMIT = 17;
-
-const std::array<int, 52> deck = { 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5,
-									6, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10, 
-									11, 11, 11, 11, 12, 12, 12, 12, 13, 13, 13, 13 };
 
 int get_bet(int money)
 {
@@ -57,8 +54,7 @@ int main()
 
 	int money = STARTING_MONEY;
 
-	std::random_device device;
-	std::default_random_engine generator(device());
+	Deck current_deck;
 
 	while (running && money > 0)
 	{
@@ -85,19 +81,16 @@ int main()
 
 			std::cout << "\nRemaining money: $" << money << "\n\n";
 
-			std::array<int, 52> current_deck(deck);
-			std::shuffle(current_deck.begin(), current_deck.end(), generator);
+			current_deck.shuffle();
 
 			std::cout << "Drawing cards!\n\n";
 
-			int current_card = 0;
-
-			while (current_card < 2)
+			while (current_deck.get_cards_drawn() < 2)
 			{
-				player_hand.add_card(current_deck, current_card);
+				player_hand.add_card(current_deck.draw_card());
 			}
 
-			dealer_hand.add_card(current_deck, current_card);
+			dealer_hand.add_card(current_deck.draw_card());
 
 			std::cout << "Your hand is: " << player_hand.get_hand_string();
 
@@ -113,7 +106,7 @@ int main()
 
 				if (!command.compare("hit"))
 				{
-					std::string card_string = player_hand.add_card(current_deck, current_card);
+					std::string card_string = player_hand.add_card(current_deck.draw_card());
 
 					std::cout << "\nYou drew a " << card_string << "!\n";
 					std::cout << "Your hand is " << player_hand.get_hand_string() << "\n";
@@ -147,7 +140,7 @@ int main()
 
 			while (dealer_hand.get_total() < DEALER_LIMIT)
 			{
-				std::string card_string = dealer_hand.add_card(current_deck, current_card);
+				std::string card_string = dealer_hand.add_card(current_deck.draw_card());
 
 				std::cout << "\nDealer drew a " << card_string << "!\n";
 				std::cout << "Dealer hand is " << dealer_hand.get_hand_string() << "\n";
