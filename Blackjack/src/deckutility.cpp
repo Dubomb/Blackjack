@@ -1,5 +1,7 @@
 #include "deckutility.h"
 
+#include <iostream>
+
 Deck::Deck()
 	: current_card(0)
 {
@@ -19,6 +21,13 @@ int Deck::draw_card()
 	int card = current_deck[current_card];
 
 	current_card++;
+
+	std::cout << current_card << "\n";
+
+	if (current_card >= 52)
+	{
+		shuffle();
+	}
 
 	return card;
 }
