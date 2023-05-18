@@ -1,3 +1,12 @@
+// 
+// file: main.cpp
+// 
+// Main program code for the blackjack game
+// Handles the main gameplay loop, user input, and console output
+//
+// @author Philip Napoli
+// 
+
 #include <iostream>
 
 #include "handutility.h"
