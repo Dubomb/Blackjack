@@ -60,7 +60,7 @@ void initial_draw(Deck& deck, Hand& player_hand, Hand& dealer_hand)
 	std::cout << "The dealer's hand is: " << dealer_hand.get_hand_string() << "\n\n";
 }
 
-int player_phase(Deck & deck, Hand& player_hand)
+void player_phase(Deck & deck, Hand& player_hand)
 {
 	int current_round = 1;
 	std::string command;
@@ -96,7 +96,7 @@ int player_phase(Deck & deck, Hand& player_hand)
 	}
 }
 
-int dealer_phase(Deck& deck, Hand& dealer_hand)
+void dealer_phase(Deck& deck, Hand& dealer_hand)
 {
 	int current_round = 1;
 
