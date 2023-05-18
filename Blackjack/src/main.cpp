@@ -3,14 +3,19 @@
 #include "handutility.h"
 #include "deckutility.h"
 
-const int STARTING_MONEY = 100;
-const int BLACKJACK = 21;
-const int BLACKJACK_MULTIPLIER = 3;
-const int WIN_MULTIPLIER = 2;
-const int LOSE_MULTIPLIER = 0;
-const int TIE_MULTIPLIER = 1;
-const int DEALER_LIMIT = 17;
+const int STARTING_MONEY = 100; ///< Money that the player starts with
+const int BLACKJACK = 21; ///< The value representing a blackjack
+const int BLACKJACK_MULTIPLIER = 3; ///< The multiplier for bet after blackjack
+const int WIN_MULTIPLIER = 2; ///< The multiplier for bet after winning
+const int LOSE_MULTIPLIER = 0; ///< The multipler for bet after losing
+const int TIE_MULTIPLIER = 1; ///< The multiplier for bet after tying
+const int DEALER_LIMIT = 17; ///< The value that the dealer draws until
 
+/// Gets user input until a valid bet is received
+/// A valid bet is less than or equal to money and greater than zero
+/// 
+/// @param money The money that the player has
+/// @return the bet input by the player
 int get_bet(int money)
 {
 	std::string command;
@@ -21,6 +26,7 @@ int get_bet(int money)
 	{
 		std::getline(std::cin, command);
 
+		// Attempts to convert the input to an integer
 		try
 		{
 			bet = std::stoi(command);
@@ -42,6 +48,13 @@ int get_bet(int money)
 	return bet;
 }
 
+/// Performs the initial draws for the player and dealer
+/// The player draws two cards and the dealer draws one card
+/// Additionally, handles output for this phase of the game
+/// 
+/// @param deck The deck to draw from
+/// @param player_hand The player's hand to put cards into
+/// @param dealer_hand The dealer's hand to put cards into
 void initial_draw(Deck& deck, Hand& player_hand, Hand& dealer_hand)
 {
 	player_hand.clear_hand();
@@ -51,15 +64,19 @@ void initial_draw(Deck& deck, Hand& player_hand, Hand& dealer_hand)
 
 	player_hand.add_card(deck.draw_card());
 	player_hand.add_card(deck.draw_card());
-
-	dealer_hand.add_card(deck.draw_card());
-
 	std::cout << "Your hand is: " << player_hand.get_hand_string() << "\n";
 	std::cout << "Your total is: " << player_hand.get_total() << "\n\n";
 
+	dealer_hand.add_card(deck.draw_card());
 	std::cout << "The dealer's hand is: " << dealer_hand.get_hand_string() << "\n\n";
 }
 
+/// Performs the player's phase of the game
+/// Receives input from the player and adds cards to the player's hand
+/// Ends once blackjack is met/exceeded, or until the player chooses to stand
+/// 
+/// @param deck The deck to draw cards from
+/// @param player_hand The player's hand to put cards into
 void player_phase(Deck & deck, Hand& player_hand)
 {
 	int current_round = 1;
@@ -96,6 +113,11 @@ void player_phase(Deck & deck, Hand& player_hand)
 	}
 }
 
+/// Performs the dealers's phase of the game
+/// Ends once the dealer threshold is exceeded
+/// 
+/// @param deck The deck to draw cards from
+/// @param player_hand The dealers's hand to put cards into
 void dealer_phase(Deck& deck, Hand& dealer_hand)
 {
 	int current_round = 1;
@@ -115,6 +137,11 @@ void dealer_phase(Deck& deck, Hand& dealer_hand)
 	}
 }
 
+/// Handles the main gameplay of blackjack
+/// Invokes helper functions for card draws and compares final hand totals
+/// 
+/// @param deck The deck to draw cards from
+/// @return The amount to multiply the player's bet by based on the outcome
 int play(Deck& deck)
 {
 	Hand player_hand;
@@ -125,6 +152,7 @@ int play(Deck& deck)
 	player_phase(deck, player_hand);
 	int final_player_total = player_hand.get_total();
 
+	// Comparison if the player has blackjack or has exceeded the limit
 	if (final_player_total == BLACKJACK)
 	{
 		std::cout << "You have blackjack!\n";
@@ -139,6 +167,7 @@ int play(Deck& deck)
 	dealer_phase(deck, dealer_hand);
 	int final_dealer_total = dealer_hand.get_total();
 
+	// Comparison between the dealer's hand and player's hand
 	if (dealer_hand.get_total() > BLACKJACK)
 	{
 		std::cout << "Dealer bust! You win!\n";
@@ -161,6 +190,10 @@ int play(Deck& deck)
 	}
 }
 
+/// Begins the main gameplay loop for blackjack
+/// Handles the player's bet and money
+/// Also calculates the player's winnings after each round
+/// Ends the loop if the player wishes to stop or runs out of money
 void start_game()
 {
 	bool running = true;
@@ -190,6 +223,7 @@ void start_game()
 
 			std::cout << "\nRemaining money: $" << money << "\n\n";
 
+			// Multiplies the bet by the multipler and adds it to the total
 			int win_multiplier = play(current_deck);
 			money += bet * win_multiplier;
 		}
@@ -200,6 +234,7 @@ void start_game()
 	}
 }
 
+/// The main function that begins the main game loop
 int main()
 {
 	std::cout << "Welcome to blackjack!\n";
