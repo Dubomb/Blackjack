@@ -67,15 +67,19 @@ int play(Deck& deck)
 
 	dealer_hand.add_card(deck.draw_card());
 
-	std::cout << "Your hand is: " << player_hand.get_hand_string();
+	std::cout << "Your hand is: " << player_hand.get_hand_string() << "\n";
 
 	std::cout << "Your total is: " << player_hand.get_total() << "\n\n";
 
-	std::cout << "The dealer's hand is: " << dealer_hand.get_hand_string() << "\n";
+	std::cout << "The dealer's hand is: " << dealer_hand.get_hand_string() << "\n\n";
+
+	int current_round = 1;
 
 	while (player_hand.get_total() < BLACKJACK)
 	{
-		std::cout << "\nType \"hit\" to take another card or \"stand\" to end your turn.\n";
+		std::cout << "=====> PLAYER ROUND " << current_round << " <=====\n\n";
+
+		std::cout << "Type \"hit\" to take another card or \"stand\" to end your turn.\n";
 
 		std::getline(std::cin, command);
 
@@ -83,66 +87,75 @@ int play(Deck& deck)
 		{
 			std::string card_string = player_hand.add_card(deck.draw_card());
 
-			std::cout << "\nYou drew a " << card_string << "!\n";
+			std::cout << "\nYou drew a " << card_string << "!\t\t";
 			std::cout << "Your hand is " << player_hand.get_hand_string() << "\n";
 
-			std::cout << "Your total is: " << player_hand.get_total() << "\n";
+			std::cout << "Your total is: " << player_hand.get_total() << "\n\n";
 		}
 		else if (!command.compare("stand"))
 		{
+			std::cout << "\n";
 			break;
 		}
 		else
 		{
 			std::cout << "Unknown input. Please enter a valid command.\n";
 		}
+
+		current_round++;
 	}
 
 	int final_player_total = player_hand.get_total();
 
 	if (final_player_total == BLACKJACK)
 	{
-		std::cout << "\nYou have blackjack!\n";
+		std::cout << "You have blackjack!\n";
 
 		return BLACKJACK_MULTIPLIER;
 	}
 	else if (final_player_total > BLACKJACK)
 	{
-		std::cout << "\nYou bust!\n";
+		std::cout << "You bust!\n";
 		return LOSE_MULTIPLIER;
 	}
 
+	current_round = 1;
+
 	while (dealer_hand.get_total() < DEALER_LIMIT)
 	{
+		std::cout << "=====> DEALER ROUND " << current_round << " <=====\n";
+
 		std::string card_string = dealer_hand.add_card(deck.draw_card());
 
-		std::cout << "\nDealer drew a " << card_string << "!\n";
+		std::cout << "\nDealer drew a " << card_string << "!\t\t";
 		std::cout << "Dealer hand is " << dealer_hand.get_hand_string() << "\n";
 
-		std::cout << "Dealer total is " << dealer_hand.get_total() << "\n";
+		std::cout << "Dealer total is " << dealer_hand.get_total() << "\n\n";
+
+		current_round++;
 	}
 
 	int final_dealer_total = dealer_hand.get_total();
 
 	if (dealer_hand.get_total() > BLACKJACK)
 	{
-		std::cout << "\nDealer bust!\n";
+		std::cout << "Dealer bust! You win!\n";
 		return WIN_MULTIPLIER;
 	}
 	else if (final_dealer_total > final_player_total)
 	{
-		std::cout << "\nDealer wins!\n";
+		std::cout << "Dealer wins!\n";
 		return LOSE_MULTIPLIER;
 	}
 	else if (final_dealer_total < final_player_total)
 	{
-		std::cout << "\nYou win!\n";
+		std::cout << "You win!\n";
 
 		return WIN_MULTIPLIER;
 	}
 	else
 	{
-		std::cout << "\nTied with the dealer! No winner.\n";
+		std::cout << "Tied with the dealer! No winner.\n";
 		return TIE_MULTIPLIER;
 	}
 }
