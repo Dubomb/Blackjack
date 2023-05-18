@@ -10,6 +10,7 @@
 #pragma once
 
 #include <random>
+#include <array>
 
 /// Class representing a deck of 52 cards
 /// Provides functions for drawing and shuffling the deck

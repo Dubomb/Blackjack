@@ -9,8 +9,6 @@
 
 #include "deckutility.h"
 
-#include <array>
-
 /// Initializes the random number generator
 /// Also sets the current deck to the start deck and current card to the start
 Deck::Deck()

@@ -9,8 +9,6 @@
 
 #include "handutility.h"
 
-#include <algorithm>
-
 const int BLACKJACK = 21; ///< Card sum of a blackjack
 
 /// Initializes the player's hand and member variables
