@@ -1,10 +1,4 @@
 #include <iostream>
-#include <string>
-#include <vector>
-#include <array>
-#include <algorithm>
-#include <random>
-#include <ctime>
 
 #include "handutility.h"
 #include "deckutility.h"
@@ -48,32 +42,28 @@ int get_bet(int money)
 	return bet;
 }
 
-int play(Deck& deck)
+void initial_draw(Deck& deck, Hand& player_hand, Hand& dealer_hand)
 {
-	std::string command;
-
-	Hand player_hand;
-	Hand dealer_hand;
-
 	player_hand.clear_hand();
 	dealer_hand.clear_hand();
 
 	std::cout << "Drawing cards!\n\n";
 
-	for (int i = 0; i < 2; i++)
-	{
-		player_hand.add_card(deck.draw_card());
-	}
+	player_hand.add_card(deck.draw_card());
+	player_hand.add_card(deck.draw_card());
 
 	dealer_hand.add_card(deck.draw_card());
 
 	std::cout << "Your hand is: " << player_hand.get_hand_string() << "\n";
-
 	std::cout << "Your total is: " << player_hand.get_total() << "\n\n";
 
 	std::cout << "The dealer's hand is: " << dealer_hand.get_hand_string() << "\n\n";
+}
 
+int player_phase(Deck & deck, Hand& player_hand)
+{
 	int current_round = 1;
+	std::string command;
 
 	while (player_hand.get_total() < BLACKJACK)
 	{
@@ -104,22 +94,11 @@ int play(Deck& deck)
 
 		current_round++;
 	}
+}
 
-	int final_player_total = player_hand.get_total();
-
-	if (final_player_total == BLACKJACK)
-	{
-		std::cout << "You have blackjack!\n";
-
-		return BLACKJACK_MULTIPLIER;
-	}
-	else if (final_player_total > BLACKJACK)
-	{
-		std::cout << "You bust!\n";
-		return LOSE_MULTIPLIER;
-	}
-
-	current_round = 1;
+int dealer_phase(Deck& deck, Hand& dealer_hand)
+{
+	int current_round = 1;
 
 	while (dealer_hand.get_total() < DEALER_LIMIT)
 	{
@@ -134,7 +113,30 @@ int play(Deck& deck)
 
 		current_round++;
 	}
+}
 
+int play(Deck& deck)
+{
+	Hand player_hand;
+	Hand dealer_hand;
+
+	initial_draw(deck, player_hand, dealer_hand);
+
+	player_phase(deck, player_hand);
+	int final_player_total = player_hand.get_total();
+
+	if (final_player_total == BLACKJACK)
+	{
+		std::cout << "You have blackjack!\n";
+		return BLACKJACK_MULTIPLIER;
+	}
+	else if (final_player_total > BLACKJACK)
+	{
+		std::cout << "You bust!\n";
+		return LOSE_MULTIPLIER;
+	}
+
+	dealer_phase(deck, dealer_hand);
 	int final_dealer_total = dealer_hand.get_total();
 
 	if (dealer_hand.get_total() > BLACKJACK)
@@ -150,7 +152,6 @@ int play(Deck& deck)
 	else if (final_dealer_total < final_player_total)
 	{
 		std::cout << "You win!\n";
-
 		return WIN_MULTIPLIER;
 	}
 	else
@@ -163,11 +164,9 @@ int play(Deck& deck)
 void start_game()
 {
 	bool running = true;
-
 	int money = STARTING_MONEY;
 
 	Deck current_deck;
-
 	current_deck.shuffle();
 
 	std::string command;
@@ -187,13 +186,11 @@ void start_game()
 			std::cout << "\nHow much would you like to bet? You have $" << money << "\n";
 
 			int bet = get_bet(money);
-
 			money -= bet;
 
 			std::cout << "\nRemaining money: $" << money << "\n\n";
 
 			int win_multiplier = play(current_deck);
-
 			money += bet * win_multiplier;
 		}
 		else
